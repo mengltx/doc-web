@@ -88,3 +88,21 @@ export function put(url, data = {}, info = {}, contentType = null) {
             })
     })
 }
+
+
+export function del(url, data = {}, info = {}, contentType = null) {
+    if (contentType) {
+        axios.defaults.headers.contentType = contentType;
+    }
+
+    return new Promise((resolve, rejects) => {
+        axios.delete(url, data, { info: info }).then((response) => {
+            if (contentType) axios.defaults.headers.contentType = 'applicaion/json'
+            resolve(response.data)
+        }
+        ).catch(error => {
+            if (contentType) axios.defaults.headers.contentType = 'applicaion/json'
+            rejects(error)
+        })
+    })
+}

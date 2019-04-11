@@ -14,19 +14,26 @@ import VueTree from 'vue-simple-tree';
 Vue.use(VueTree);
 
 import mavonEditor from 'mavon-editor';
-
-
 Vue.use(mavonEditor);
+
 
 Vue.use(VueRouter)
 
-import { post,get ,put} from "./util/http.js";
+import { post,get ,put,del} from "./util/http.js";
 import { success } from "./util/notify.js";
 Vue.prototype.$post = post;
 Vue.prototype.$get = get;
 Vue.prototype.$put = put;
+Vue.prototype.$del = del;
 Vue.prototype.$success = success;
 
+
+import moment from 'moment'
+Vue.prototype.$moment = moment;
+moment.locale('zh-cn');
+Vue.filter('datefmt',function(input,fmtString) {
+    return moment(input).format(fmtString)
+});
 
 const container = () =>import('./container.vue');
 const edit = () =>import('./edit.vue');

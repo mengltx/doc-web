@@ -82,7 +82,7 @@ module.exports = {
         new webpack.ProvidePlugin({
             Vue: ['vue/dist/vue.esm.js', 'default'],
             VueRouter: ['vue-router/dist/vue-router.esm.js', 'default'],
-            mavonEditor:'mavon-editor'
+            mavonEditor:'mavon-editor',
             
         })
     ],

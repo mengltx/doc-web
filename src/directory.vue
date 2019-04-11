@@ -1,17 +1,22 @@
 <template>
   <div class="container" style="margin:15% 25% 25% ">
     <div class="left-items" style="float: left;">
-      <el-button type="text" @click="dialogFormVisible = true">添加</el-button>
+      <el-button type="text" @click="openAdd">添加</el-button>
     </div>
     <div class="right-items" style="float: right;">
       <el-button type="text" @click="back">返回</el-button>
     </div>
 
     <el-table :data="directorys" border style="width: 100%">
-      <el-table-column prop="name" label="目录名称" width="180"></el-table-column>
-      <el-table-column prop="createTime" label="添加时间" width="180"></el-table-column>
+      <el-table-column prop="name" label="目录名称"></el-table-column>
+      <el-table-column prop="createTime" label="添加时间"></el-table-column>
       <el-table-column prop="order" label="序号"></el-table-column>
-      <el-table-column prop="address" label="操作"></el-table-column>
+      <el-table-column fixed="right" label="操作" width="100">
+        <template slot-scope="scope">
+          <el-button @click="openEditor(scope.row)" type="text" size="small">编辑</el-button>
+          <el-button type="text" size="small" @click="openDelete(scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <el-dialog title="添加目录" :visible.sync="dialogFormVisible">
@@ -67,8 +72,54 @@ export default {
     };
   },
   methods: {
+    openEditor(row) {
+      this.dialogFormVisible = true;
+      //alert(JSON.stringify(row))
+      this.form = { ...row };
+      console.log(JSON.stringify(this.form));
+    },
+    doUpdate() {
+      this.$put("/doc-api/menus/", this.form).then(response => {
+        if (response.code === 0) {
+          this.$message({
+            type: "success",
+            message: "修改成功"
+          });
+          this.listDirectory();
+        }
+      });
+    },
+    openDelete(row) {
+      this.$confirm("确认删除目录?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.doDeleteDir(row);
+        })
+        .catch(() => {});
+    },
+    doDeleteDir(row) {
+      this.$del("/doc-api/menus/" + row.id)
+        .then(response => {
+          if (response.code == 0) {
+            this.$message({
+              type: "success",
+              message: "删除成功"
+            });
+            this.listDirectory();
+          }
+        })
+        .catch(error => {});
+    },
     back() {
       this.$router.push("/");
+    },
+    openAdd(){
+      this.dialogFormVisible=true;
+      this.form = {};
+      
     },
     addDirectory() {
       this.$post("/doc-api/menus/directory/add", this.form).then(response => {
@@ -79,8 +130,13 @@ export default {
       });
     },
     listDirectory() {
+      this.directorys = [];
       this.$get("/doc-api/menus/directory").then(response => {
-        this.directorys = response.data;
+        response.data.forEach(it=>{
+          this.directorys.push({
+            ...it,createTime:this.$moment(it.createTime).format('YYYY-MM-DD hh:mm:ss')
+          }) 
+        });
       });
     }
   },
